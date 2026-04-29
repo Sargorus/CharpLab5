@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Windows.Forms;
 using CharpLab5.Objects;
 
 namespace CharpLab5
@@ -18,8 +19,7 @@ namespace CharpLab5
         {
             InitializeComponent();
             player = new Player(pbMain.Width / 2, pbMain.Height / 2, 0);
-            //greenSporeObj = new GreenCircle(10, 10, 0, 100, 35);
-            // реакция на пересечение
+
             player.OnOverlap += (p, obj) =>
             {
                 txtLog.Text = $"{DateTime.Now:HH:mm:ss:ff}] Игрок пересекся с {obj}\n" + txtLog.Text;
@@ -40,6 +40,12 @@ namespace CharpLab5
             };
 
 
+            
+            for (int i = 0; i < 2; i++)
+            {
+                createGreen(objects);
+            }
+
             marker = new Marker(pbMain.Width / 2 + 50, pbMain.Height / 2 + 50, 0);
 
 
@@ -53,23 +59,19 @@ namespace CharpLab5
 
         private void pbMain_Paint(object sender, PaintEventArgs e)
         {
-            var g = e.Graphics; // вытащили объект графики из события
-
-
-            //g.FillRectangle(new SolidBrush(Color.White), 0, 0, pbMain.Width, pbMain.Height);
-            // залил фон (можно и так)
+            var g = e.Graphics; 
             g.Clear(Color.White);
 
             updatePlayer();
 
-            // Пересечения, их пересчет
+
             foreach (var obj in objects.ToList())
             {
-                // Проверка столкновления с игроком 
+
                 if (obj != player && player.Overlaps(obj, g))
                 {
-                    player.Overlap(obj); // Игрок пересекся с объектом
-                    obj.Overlap(player); // И объект пересекся с игроком
+                    player.Overlap(obj); 
+                    obj.Overlap(player); 
                 }
                 if (obj is GreenCircle)
                 {
@@ -81,7 +83,6 @@ namespace CharpLab5
                 }
             }
 
-            // Перерисуем
             foreach (var obj in objects)
             {
                 g.Transform = obj.GetTransform();
@@ -109,40 +110,41 @@ namespace CharpLab5
         {
             if (marker != null)
             {
-                // Расчет вектора между игроком и маркером
+
                 float dx = marker.X - player.X;
                 float dy = marker.Y - player.Y;
 
-                // Нахождение длинны
                 float length = MathF.Sqrt(dx * dx + dy * dy);
-                dx /= length; // Нормализация координаты
+                dx /= length; 
                 dy /= length;
 
-                // Пересчет координаты игрока
                 player.vX += dx * 10.9f;
                 player.vY += dy * 0.9f;
 
-                // Расчёт угла поворота игрока
+
                 player.Angle = 90 - MathF.Atan2(player.vX, player.vY) * 180 / MathF.PI;
             }
 
-            // тормозящий момент,
-            // нужен чтобы, когда игрок достигнет маркера произошло постепенное замедление
+            
             player.vX += -player.vX * 0.1f;
             player.vY += -player.vY * 0.1f;
 
-            // пересчет позиция игрока с помощью вектора скорости
+
             player.X += player.vX;
             player.Y += player.vY;
         }
 
         private void createGreen(List<BaseObject> objects)
         {
-            GreenCircle g = new GreenCircle((rnd.Next() % (pbMain.Width - 25) + 25), (rnd.Next() % (pbMain.Height - 25)), 0, rnd.Next() % 13 + 2, rnd.Next() % 350 + 100));
+            GreenCircle g = new GreenCircle(( rnd.Next() % (pbMain.Width - 25) + 25 ) , (rnd.Next() % (pbMain.Height - 25)), 0, rnd.Next() % 13 + 2, rnd.Next() % 350 + 100);
+            g.ToDieOfOld += (green) =>
+            {
+                objects.Remove(green);
+                createGreen(objects);
+                txtLog.Text = $"[{DateTime.Now:HH:mm:ss:ff}] Зелёный кружок умер, создан новый\n" + txtLog.Text;
+            };
             objects.Add(g);
-            // if(g.timeToLive < 0) { objects.Add(g); }
         }
-
     }
 
 }

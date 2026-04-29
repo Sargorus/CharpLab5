@@ -25,16 +25,15 @@ namespace CharpLab5.Objects
             g.DrawEllipse(new Pen(Color.Green, 2), -6, -6, 12, 12);
             g.DrawString(
                         $"Живет ещё {this.timeToLive}",
-                        new Font("Verdana", 8), // шрифт и размер
-                        new SolidBrush(Color.Green), // цвет шрифта
-                        10, 10 // точка в которой нарисовать текст
+                        new Font("Verdana", 8), 
+                        new SolidBrush(Color.Green), 
+                        10, 10 
 );
         }
 
         public override GraphicsPath GetGraphicsPath()
         {
             var path = base.GetGraphicsPath();
-            // исп самый малый круг в центре маркера
             path.AddEllipse(-3, -3, 6, 6);
             return path;
         }
@@ -42,6 +41,10 @@ namespace CharpLab5.Objects
         public override void ToTick()
         {
             this.timeToLive -= 10.1f;
+            if(this.timeToLive <= 0)
+            {
+                ToDieOfOld?.Invoke(this);
+            }
         }
 
     }
