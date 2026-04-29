@@ -39,6 +39,7 @@
             pbMain.Size = new Size(776, 416);
             pbMain.TabIndex = 0;
             pbMain.TabStop = false;
+            pbMain.Paint += pbMain_Paint;
             // 
             // Form1
             // 
