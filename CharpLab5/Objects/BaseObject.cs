@@ -14,11 +14,14 @@ namespace CharpLab5.Objects
         public float Y;
         public float Angle;
 
+        public Action<BaseObject, BaseObject> OnOverlap;
+
         public BaseObject(float x, float y, float angle)
         {
             X = x;
             Y = y;
             Angle = angle;
+
         }
 
         public Matrix GetTransform()
@@ -62,7 +65,15 @@ namespace CharpLab5.Objects
             region.Intersect(path2); // пересекаем формы
             return !region.IsEmpty(g); // если полученная форма не пуста то значит было пересечение
         }
-    }
 
+
+        public virtual void Overlap(BaseObject obj)
+        {
+            if (this.OnOverlap != null) // если есть привязанные функции к полю, то
+            {
+                this.OnOverlap(this, obj); // Отрисуем их
+            }
+        }
+    }
 
 }

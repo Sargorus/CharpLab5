@@ -12,6 +12,16 @@ namespace CharpLab5
         {
             InitializeComponent();
             player = new Player(pbMain.Width / 2, pbMain.Height / 2, 0);
+            // реакция на пересечение
+            player.OnOverlap += (p, obj) =>
+            {
+                txtLog.Text = $"{DateTime.Now:HH:mm:ss:ff}] Игрок пересекся с {obj}\n" + txtLog.Text;
+            };
+            player.OnMarkerOverlap += (m) =>
+            {
+                objects.Remove(m);
+                marker = null;
+            };
             marker = new Marker(pbMain.Width / 2 + 50, pbMain.Height / 2 + 50, 0);
 
             objects.Add(marker);
@@ -30,29 +40,44 @@ namespace CharpLab5
             // залил фон (можно и так)
             g.Clear(Color.White);
 
+            updatePlayer();
+
+            // Пересечения их пересчет
             foreach (var obj in objects.ToList())
             {
                 // Проверка столкновления с игроком 
-                if (obj != player && player.Overlaps(obj,g))
+                if (obj != player && player.Overlaps(obj, g))
                 {
-                    // Если было то пишем в лог:
-                    txtLog.Text = $"{DateTime.Now:HH:mm:ss:ff}] Игрок пересекся с {obj}\n" + txtLog.Text;
-
-                    if (obj == marker)
-                    {
-                        objects.Remove(marker);
-                        marker = null;
-                    }    
+                    player.Overlap(obj); // Игрок пересекся с объектом
+                    obj.Overlap(player); // И объект пересекся с игроком
                 }
+            }
 
+            // Перерисуем
+            foreach (var obj in objects)
+            {
                 g.Transform = obj.GetTransform();
                 obj.Render(g);
             }
-
-
         }
 
         private void timer_Tick(object sender, EventArgs e)
+        {
+            pbMain.Invalidate();
+        }
+
+        private void pbMain_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (marker == null)
+            {
+                marker = new Marker(0,0,0);
+                objects.Add(marker);
+            }
+            marker.X = e.X;
+            marker.Y = e.Y;
+        }
+
+        private void updatePlayer()
         {
             if (marker != null)
             {
@@ -66,22 +91,21 @@ namespace CharpLab5
                 dy /= length;
 
                 // Пересчет координаты игрока
-                player.X += dx * 2;
-                player.Y += dy * 2;
-            }
-            // Запрос на обновление pbMain (вызов поновой посути)
-            pbMain.Invalidate();
-        }
+                player.vX += dx * 0.3f;
+                player.vY += dy * 0.25f;
 
-        private void pbMain_MouseClick(object sender, MouseEventArgs e)
-        {
-            if (marker == null)
-            {
-                marker = new Marker(0,0,0);
-                objects.Add(marker);
+                // Расчёт угла поворота игрока
+                player.Angle = 90 - MathF.Atan2(player.vX, player.vY) * 180 / MathF.PI;
             }
-            marker.X = e.X;
-            marker.Y = e.Y;
+
+            // тормозящий момент,
+            // нужен чтобы, когда игрок достигнет маркера произошло постепенное замедление
+            player.vX += -player.vX * 0.1f;
+            player.vY += -player.vY * 0.1f;
+
+            // пересчет позиция игрока с помощью вектора скорости
+            player.X += player.vX;
+            player.Y += player.vY;
         }
     }
 }
