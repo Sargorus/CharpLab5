@@ -28,18 +28,27 @@
         /// </summary>
         private void InitializeComponent()
         {
+            components = new System.ComponentModel.Container();
             pbMain = new PictureBox();
+            timer = new System.Windows.Forms.Timer(components);
             ((System.ComponentModel.ISupportInitialize)pbMain).BeginInit();
             SuspendLayout();
             // 
             // pbMain
             // 
-            pbMain.Location = new Point(12, 22);
+            pbMain.Location = new Point(12, 3);
             pbMain.Name = "pbMain";
             pbMain.Size = new Size(776, 416);
             pbMain.TabIndex = 0;
             pbMain.TabStop = false;
             pbMain.Paint += pbMain_Paint;
+            pbMain.MouseClick += pbMain_MouseClick;
+            // 
+            // timer
+            // 
+            timer.Enabled = true;
+            timer.Interval = 30;
+            timer.Tick += timer_Tick;
             // 
             // Form1
             // 
@@ -56,5 +65,6 @@
         #endregion
 
         private PictureBox pbMain;
+        private System.Windows.Forms.Timer timer;
     }
 }
