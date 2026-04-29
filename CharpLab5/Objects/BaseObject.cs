@@ -4,7 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Drawing; // добавил using
-using System.Drawing.Drawing2D; 
+using System.Drawing.Drawing2D;
+using System.Timers;
 
 namespace CharpLab5.Objects
 {
@@ -74,6 +75,10 @@ namespace CharpLab5.Objects
                 this.OnOverlap(this, obj); // Отрисуем их
             }
         }
-    }
 
+        public virtual void ToTick()
+        {
+
+        }
+    }
 }

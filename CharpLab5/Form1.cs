@@ -1,17 +1,24 @@
+using System.Collections.Generic;
 using CharpLab5.Objects;
 
 namespace CharpLab5
 {
     public partial class Form1 : Form
     {
+        public float spore = 0;
+
+        public static Random rnd = new Random();
+
         List<BaseObject> objects = new();
         Player player;
         Marker marker;
+
 
         public Form1()
         {
             InitializeComponent();
             player = new Player(pbMain.Width / 2, pbMain.Height / 2, 0);
+            //greenSporeObj = new GreenCircle(10, 10, 0, 100, 35);
             // реакция на пересечение
             player.OnOverlap += (p, obj) =>
             {
@@ -22,10 +29,23 @@ namespace CharpLab5
                 objects.Remove(m);
                 marker = null;
             };
+            player.OnGreenMarkerOverlap += (m) =>
+            {
+                spore = m.cost + spore;
+                txtLog.Text = $"{DateTime.Now:HH:mm:ss:ff}] Объект: {m} , был пренесен на координаты: {m.X} , {m.Y}.\n" + txtLog.Text;
+                txtLog.Text = $"{DateTime.Now:HH:mm:ss:ff}] Добавлено: {m.cost} очков!\n" + txtLog.Text;
+                objects.Remove(m);
+                createGreen(objects);
+                labelSpore.Text = $"Очки: {spore}";
+            };
+
+
             marker = new Marker(pbMain.Width / 2 + 50, pbMain.Height / 2 + 50, 0);
+
 
             objects.Add(marker);
             objects.Add(player);
+            createGreen(objects);
             objects.Add(new MyRectangle(50, 50, 0));
             objects.Add(new MyRectangle(100, 100, 45));
 
@@ -42,7 +62,7 @@ namespace CharpLab5
 
             updatePlayer();
 
-            // Пересечения их пересчет
+            // Пересечения, их пересчет
             foreach (var obj in objects.ToList())
             {
                 // Проверка столкновления с игроком 
@@ -50,6 +70,14 @@ namespace CharpLab5
                 {
                     player.Overlap(obj); // Игрок пересекся с объектом
                     obj.Overlap(player); // И объект пересекся с игроком
+                }
+                if (obj is GreenCircle)
+                {
+                    obj.ToTick();
+                }
+                if(obj is GreenCircle)
+                { 
+
                 }
             }
 
@@ -70,7 +98,7 @@ namespace CharpLab5
         {
             if (marker == null)
             {
-                marker = new Marker(0,0,0);
+                marker = new Marker(0, 0, 0);
                 objects.Add(marker);
             }
             marker.X = e.X;
@@ -91,8 +119,8 @@ namespace CharpLab5
                 dy /= length;
 
                 // Пересчет координаты игрока
-                player.vX += dx * 0.3f;
-                player.vY += dy * 0.25f;
+                player.vX += dx * 10.9f;
+                player.vY += dy * 0.9f;
 
                 // Расчёт угла поворота игрока
                 player.Angle = 90 - MathF.Atan2(player.vX, player.vY) * 180 / MathF.PI;
@@ -107,5 +135,14 @@ namespace CharpLab5
             player.X += player.vX;
             player.Y += player.vY;
         }
+
+        private void createGreen(List<BaseObject> objects)
+        {
+            GreenCircle g = new GreenCircle((rnd.Next() % (pbMain.Width - 25) + 25), (rnd.Next() % (pbMain.Height - 25)), 0, rnd.Next() % 13 + 2, rnd.Next() % 350 + 100));
+            objects.Add(g);
+            // if(g.timeToLive < 0) { objects.Add(g); }
+        }
+
     }
+
 }
