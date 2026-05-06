@@ -35,7 +35,7 @@ namespace CharpLab5
                 txtLog.Text = $"{DateTime.Now:HH:mm:ss:ff}] Объект: {m} , был пренесен на координаты: {m.X} , {m.Y}.\n" + txtLog.Text;
                 txtLog.Text = $"{DateTime.Now:HH:mm:ss:ff}] Добавлено: {m.cost} очков!\n" + txtLog.Text;
                 objects.Remove(m);
-                createGreen(objects);
+                createGreen();
                 labelSpore.Text = $"Очки: {spore}";
             };
 
@@ -43,7 +43,7 @@ namespace CharpLab5
             
             for (int i = 0; i < 2; i++)
             {
-                createGreen(objects);
+                createGreen();
             }
 
             marker = new Marker(pbMain.Width / 2 + 50, pbMain.Height / 2 + 50, 0);
@@ -51,7 +51,7 @@ namespace CharpLab5
 
             objects.Add(marker);
             objects.Add(player);
-            createGreen(objects);
+            createGreen();
             objects.Add(new MyRectangle(50, 50, 0));
             objects.Add(new MyRectangle(100, 100, 45));
 
@@ -73,14 +73,9 @@ namespace CharpLab5
                     player.Overlap(obj); 
                     obj.Overlap(player); 
                 }
-                if (obj is GreenCircle)
-                {
-                    obj.ToTick();
-                }
-                if(obj is GreenCircle)
-                { 
 
-                }
+                obj.ToTick();
+
             }
 
             foreach (var obj in objects)
@@ -134,13 +129,13 @@ namespace CharpLab5
             player.Y += player.vY;
         }
 
-        private void createGreen(List<BaseObject> objects)
+        private void createGreen()
         {
-            GreenCircle g = new GreenCircle(( rnd.Next() % (pbMain.Width - 25) + 25 ) , (rnd.Next() % (pbMain.Height - 25)), 0, rnd.Next() % 13 + 2, rnd.Next() % 350 + 100);
+            GreenCircle g = new GreenCircle(( rnd.Next() % (pbMain.Width - 25) + 25 ) , (rnd.Next() % (pbMain.Height - 25)), 0, rnd.Next() % 13 + 2, rnd.Next() % 3500 + 1000);
             g.ToDieOfOld += (green) =>
             {
                 objects.Remove(green);
-                createGreen(objects);
+                createGreen();
                 txtLog.Text = $"[{DateTime.Now:HH:mm:ss:ff}] Зелёный кружок умер, создан новый\n" + txtLog.Text;
             };
             objects.Add(g);
